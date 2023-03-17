@@ -6,7 +6,7 @@ import (
 )
 
 type PostRepository interface {
-	GetAll(limit, offset int) ([]entity.Post, error)
+	GetAll(limit, offset int, status string) ([]entity.Post, error)
 	Create(post *entity.Post) error
 	GetOne(id uint) (entity.Post, error)
 	Update(post *entity.Post, id uint) error
@@ -17,9 +17,16 @@ type postRepository struct {
 	db *gorm.DB
 }
 
-func (pr *postRepository) GetAll(limit, offset int) ([]entity.Post, error) {
+func (pr *postRepository) GetAll(limit, offset int, status string) ([]entity.Post, error) {
 	var posts []entity.Post
-	err := pr.db.Offset(offset).Limit(limit).Order("id").Find(&posts).Error
+	query := pr.db.Offset(offset)
+	if limit > 0 {
+		query = query.Limit(limit)
+	}
+	if status != "" {
+		query.Where(&entity.Post{Status: status})
+	}
+	err := query.Order("id").Find(&posts).Error
 	return posts, err
 }
 

@@ -22,7 +22,8 @@ func InitializeRoute(server *gin.Engine, db *gorm.DB, config config.Config) {
 	// post router
 	postRouter := server.Group("/post")
 	{
-		postRouter.GET("/:id/:offset", postHandler.GetAll) // jika menggunakan :limit akan konflik dengan :id
+		postRouter.GET("/:id/:offset", postHandler.GetAll)               // jika menggunakan :limit akan konflik dengan :id
+		postRouter.GET("/:id/:offset/:status", postHandler.GetAllFilter) // jika menggunakan :limit akan konflik dengan :id
 		postRouter.POST("", postHandler.Create)
 		postRouter.GET("/:id", postHandler.GetOne)
 		postRouter.PUT("/:id", postHandler.Update)

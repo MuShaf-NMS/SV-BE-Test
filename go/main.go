@@ -4,6 +4,7 @@ import (
 	"github.com/MuShaf-NMS/SV-BE-Test/config"
 	"github.com/MuShaf-NMS/SV-BE-Test/database"
 	"github.com/MuShaf-NMS/SV-BE-Test/router"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +17,7 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	server := gin.Default()
+	server.Use(cors.Default())
 	router.InitializeRoute(server, db, *config)
 	server.Run(":" + config.App_Port)
 }

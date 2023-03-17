@@ -8,7 +8,7 @@ import (
 )
 
 type PostService interface {
-	GetAll(limit, offset int) ([]entity.Post, error)
+	GetAll(limit, offset int, status string) ([]entity.Post, error)
 	Create(postDto dto.PostDTO) error
 	GetOne(id uint) (entity.Post, error)
 	Update(postDto dto.PostDTO, id uint) error
@@ -19,8 +19,8 @@ type postService struct {
 	repository repository.PostRepository
 }
 
-func (pr *postService) GetAll(limit, offset int) ([]entity.Post, error) {
-	posts, err := pr.repository.GetAll(limit, offset)
+func (pr *postService) GetAll(limit, offset int, status string) ([]entity.Post, error) {
+	posts, err := pr.repository.GetAll(limit, offset, status)
 	return posts, err
 }
 

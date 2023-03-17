@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/MuShaf-NMS/SV-BE-Test/dto"
@@ -11,6 +12,7 @@ import (
 
 type PostHandler interface {
 	GetAll(ctx *gin.Context)
+	GetAllFilter(ctx *gin.Context)
 	Create(ctx *gin.Context)
 	GetOne(ctx *gin.Context)
 	Update(ctx *gin.Context)
@@ -34,7 +36,31 @@ func (ph *postHandler) GetAll(ctx *gin.Context) {
 		ctx.JSON(400, res)
 		return
 	}
-	posts, err := ph.service.GetAll(limit, offset)
+	posts, err := ph.service.GetAll(limit, offset, "")
+	if err != nil {
+		e, _ := err.(*helper.CustomError)
+		res := helper.ErrorResponseBuilder(e.Message, e.Errors)
+		ctx.JSON(e.Code, res)
+		return
+	}
+	ctx.JSON(200, posts)
+}
+
+func (ph *postHandler) GetAllFilter(ctx *gin.Context) {
+	limit, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		res := helper.ErrorResponseBuilder("Limit must be integer", nil)
+		ctx.JSON(400, res)
+		return
+	}
+	offset, err := strconv.Atoi(ctx.Param("offset"))
+	if err != nil {
+		res := helper.ErrorResponseBuilder("Offset must be integer", nil)
+		ctx.JSON(400, res)
+		return
+	}
+	status := ctx.Param("status")
+	posts, err := ph.service.GetAll(limit, offset, status)
 	if err != nil {
 		e, _ := err.(*helper.CustomError)
 		res := helper.ErrorResponseBuilder(e.Message, e.Errors)
@@ -91,6 +117,7 @@ func (ph *postHandler) Update(ctx *gin.Context) {
 	ctx.BindJSON(&post)
 	if err := helper.Validate(post); err != nil {
 		errs := helper.ValidationError(err)
+		fmt.Println(errs)
 		res := helper.ErrorResponseBuilder("Validation error", errs)
 		ctx.JSON(400, res)
 		return
